@@ -56,6 +56,9 @@ android {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
+    ksp {
+        arg("snapshotFileGenerationPath", "/Users/akashkamble/AndroidStudioProjects/SnapshotCodeGenerator/app/src/screenshotTest/kotlin")
+    }
 }
 
 dependencies {

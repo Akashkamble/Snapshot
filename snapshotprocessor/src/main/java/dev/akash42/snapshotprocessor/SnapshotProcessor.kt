@@ -12,10 +12,15 @@ import java.io.File
 
 class SnapshotProcessor(
     private val logger: KSPLogger,
+    private val options: Map<String, String>
 ) : SymbolProcessor {
     @OptIn(KspExperimental::class)
     override fun process(resolver: Resolver): List<KSAnnotated> {
-        logger.warn("Hooray!!!")
+        val filePath = options["snapshotFileGenerationPath"]
+        if (filePath == null) {
+            logger.error("Please provide snapshotFileGenerationPath in the processor options to generate snapshot files")
+            return emptyList()
+        }
         val symbols = resolver.getSymbolsWithAnnotation(Snapshot::class.qualifiedName!!)
         val validSymbols = symbols.filter { it is KSFunctionDeclaration && it.validate() }
             .filter { function ->
@@ -27,7 +32,7 @@ class SnapshotProcessor(
         val map = mutableMapOf<File, MutableSet<String>>()
 
         validSymbols.toList().forEach {
-            it.accept(SnapshotVisitor(logger, map), Unit)
+            it.accept(SnapshotVisitor(logger, map, filePath), Unit)
         }
 
         map.forEach { (file, set) ->

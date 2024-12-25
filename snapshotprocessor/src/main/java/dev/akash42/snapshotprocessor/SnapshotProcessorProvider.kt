@@ -8,6 +8,7 @@ class SnapshotProcessorProvider : SymbolProcessorProvider {
     override fun create(environment: SymbolProcessorEnvironment): SymbolProcessor {
         return SnapshotProcessor(
             environment.logger,
+            environment.options
         )
     }
 }
