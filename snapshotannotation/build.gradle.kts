@@ -4,6 +4,7 @@ plugins {
     id("maven-publish")
 }
 group = "com.github.Akashkamble"
+version = "1.0.2"
 
 java {
     sourceCompatibility = JavaVersion.VERSION_17
