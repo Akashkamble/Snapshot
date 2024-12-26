@@ -19,10 +19,9 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
 
 publishing {
     publications {
-        register<MavenPublication>("release") {
-            afterEvaluate {
-                from(components["release"])
-            }
+        create<MavenPublication>("release") {
+            from(components["java"])
+            artifactId = project.name
         }
     }
 }

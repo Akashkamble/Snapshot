@@ -17,10 +17,9 @@ java {
 
 publishing {
     publications {
-        register<MavenPublication>("release") {
-            afterEvaluate {
-                from(components["release"])
-            }
+        create<MavenPublication>("mavenJava") {
+            from(components["java"])
+            artifactId = project.name
         }
     }
 }
