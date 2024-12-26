@@ -8,7 +8,7 @@ import java.io.File
 
 class SnapshotVisitor(
     private val logger: KSPLogger,
-    private val map: MutableMap<File, MutableSet<String>>,
+    private val map: MutableMap<File, MutableSet<CodeLine>>,
     private val filePathToGenerateCode: String
 ) : KSVisitorVoid() {
 
@@ -36,20 +36,25 @@ class SnapshotVisitor(
                 appendLine(" * Do not modify this file.")
                 appendLine(" */")
             }
-            add(comment)
+            add(CodeLine(line = comment))
         }
         // get imports from functions
         set.apply {
-            add("import ${getPackageName(function.containingFile!!)}.$importNameToGenerate")
+            add(
+                CodeLine(
+                    type = CodeLineType.IMPORT,
+                    line = "import ${getPackageName(function.containingFile!!)}.$importNameToGenerate"
+                )
+            )
         }
         set.apply {
             addAll(getImports(function.containingFile!!).map { import ->
-                "import $import"
+                CodeLine(type = CodeLineType.IMPORT, line = "import $import")
             })
         }
 
         set.apply {
-            add(createFunctionBody(function))
+            add(CodeLine(line = createFunctionBody(function)))
         }
         super.visitFunctionDeclaration(function, data)
     }
@@ -96,7 +101,7 @@ class SnapshotVisitor(
             stringBuilder.append("fun ${function.simpleName.asString()}() {\n")
             stringBuilder.append("  $functionBody")
             stringBuilder.append("\n")
-            stringBuilder.append("}\n\n")
+            stringBuilder.append("}\n")
         }
         return stringBuilder.toString()
     }

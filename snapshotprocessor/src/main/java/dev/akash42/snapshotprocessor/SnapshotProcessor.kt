@@ -11,33 +11,39 @@ import dev.akash42.snapshotannotation.Snapshot
 import java.io.File
 
 class SnapshotProcessor(
-    private val logger: KSPLogger,
-    private val options: Map<String, String>
+    private val logger: KSPLogger, private val options: Map<String, String>
 ) : SymbolProcessor {
     @OptIn(KspExperimental::class)
     override fun process(resolver: Resolver): List<KSAnnotated> {
-        val filePath = options["snapshotFileGenerationPath"]
-        if (filePath == null) {
+        val filePath = options["snapshotFileGenerationPath"] ?: run {
             logger.error("Please provide snapshotFileGenerationPath in the processor options to generate snapshot files")
             return emptyList()
         }
+//        filePath.let {
+//            File(it).deleteRecursively()
+//        }
         val symbols = resolver.getSymbolsWithAnnotation(Snapshot::class.qualifiedName!!)
-        val validSymbols = symbols.filter { it is KSFunctionDeclaration && it.validate() }
-            .filter { function ->
-                val annotationNames = function.annotations.map { it.shortName.asString() }
-                "Preview" in annotationNames && "Composable" in annotationNames
-            }
-            .map { it as KSFunctionDeclaration }
+        val validSymbols =
+            symbols.filter { it is KSFunctionDeclaration && it.validate() }.filter { function ->
+                    val annotationNames = function.annotations.map { it.shortName.asString() }
+                    "Preview" in annotationNames && "Composable" in annotationNames
+                }.map { it as KSFunctionDeclaration }
 
-        val map = mutableMapOf<File, MutableSet<String>>()
+        val map = mutableMapOf<File, MutableSet<CodeLine>>()
 
         validSymbols.toList().forEach {
             it.accept(SnapshotVisitor(logger, map, filePath), Unit)
         }
 
         map.forEach { (file, set) ->
+            val imports = set.filter { it.type == CodeLineType.IMPORT }.map { it.line }
+            val nonImports = set.filter { it.type == CodeLineType.NON_IMPORT }.map { it.line }
             file.bufferedWriter().use { writer ->
-                set.forEach {
+                imports.forEach {
+                    writer.write(it)
+                    writer.newLine()
+                }
+                nonImports.forEach {
                     writer.write(it)
                     writer.newLine()
                 }
