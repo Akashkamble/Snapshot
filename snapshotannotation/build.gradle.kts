@@ -1,7 +1,9 @@
 plugins {
     id("java-library")
     alias(libs.plugins.jetbrains.kotlin.jvm)
+    id("maven-publish")
 }
+group = "com.github.Akashkamble"
 
 java {
     sourceCompatibility = JavaVersion.VERSION_17

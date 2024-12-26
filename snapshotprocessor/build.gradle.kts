@@ -4,7 +4,10 @@ import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSetTree.Companion.main
 plugins {
     alias(libs.plugins.jetbrains.kotlin.jvm)
     id("com.google.devtools.ksp")
+    id("maven-publish")
 }
+
+group = "com.github.Akashkamble"
 
 java {
     sourceCompatibility = JavaVersion.VERSION_17
