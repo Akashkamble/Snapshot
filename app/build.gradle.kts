@@ -58,6 +58,7 @@ android {
     }
     ksp {
         arg("snapshotFileGenerationPath", "/Users/akashkamble/AndroidStudioProjects/SnapshotCodeGenerator/app/src/screenshotTest/kotlin")
+        arg("disableSnapshotCodeGeneration", "true")
     }
 }
 

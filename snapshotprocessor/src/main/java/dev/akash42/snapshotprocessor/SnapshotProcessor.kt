@@ -15,19 +15,24 @@ class SnapshotProcessor(
 ) : SymbolProcessor {
     @OptIn(KspExperimental::class)
     override fun process(resolver: Resolver): List<KSAnnotated> {
+        val isDisabled = options["disableSnapshotCodeGeneration"]?.toBoolean() ?: false
+
+        if (isDisabled) {
+            logger.warn("Snapshot code generation is disabled")
+            return emptyList()
+        }
+
         val filePath = options["snapshotFileGenerationPath"] ?: run {
             logger.error("Please provide snapshotFileGenerationPath in the processor options to generate snapshot files")
             return emptyList()
         }
-//        filePath.let {
-//            File(it).deleteRecursively()
-//        }
+
         val symbols = resolver.getSymbolsWithAnnotation(Snapshot::class.qualifiedName!!)
         val validSymbols =
             symbols.filter { it is KSFunctionDeclaration && it.validate() }.filter { function ->
-                    val annotationNames = function.annotations.map { it.shortName.asString() }
-                    "Preview" in annotationNames && "Composable" in annotationNames
-                }.map { it as KSFunctionDeclaration }
+                val annotationNames = function.annotations.map { it.shortName.asString() }
+                "Preview" in annotationNames && "Composable" in annotationNames
+            }.map { it as KSFunctionDeclaration }
 
         val map = mutableMapOf<File, MutableSet<CodeLine>>()
 
