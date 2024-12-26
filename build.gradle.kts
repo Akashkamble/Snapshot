@@ -20,9 +20,3 @@ buildscript {
     }
 }
 
-allprojects {
-    allprojects {
-        ext["MY_STRING"] = "Hello from Kotlin!"
-    }
-}
-

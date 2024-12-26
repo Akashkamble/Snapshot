@@ -15,6 +15,15 @@ java {
     targetCompatibility = JavaVersion.VERSION_17
 }
 
+publishing {
+    publications {
+        create<MavenPublication>("mavenJava") {
+            from(components["java"])
+            artifactId = project.name
+        }
+    }
+}
+
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
     kotlinOptions {
