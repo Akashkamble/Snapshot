@@ -43,8 +43,13 @@ class SnapshotProcessor(
         map.forEach { (file, set) ->
             val imports = set.filter { it.type == CodeLineType.IMPORT }.map { it.line }
             val nonImports = set.filter { it.type == CodeLineType.NON_IMPORT }.map { it.line }
+            val usedImports = imports.filter { import ->
+                val importName = import.substringAfterLast('.')
+                nonImports.any { it.contains(importName) }
+            }.toMutableSet()
+            usedImports.removeIf { it.contains("import dev.akash42.snapshotannotation.Snapshot") }
             file.bufferedWriter().use { writer ->
-                imports.forEach {
+                usedImports.forEach {
                     writer.write(it)
                     writer.newLine()
                 }
